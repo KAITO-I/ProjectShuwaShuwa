@@ -1,0 +1,29 @@
+﻿<Properties StartupConfiguration="{6CDFC25C-E067-B49D-E024-9CCCD6738927}|">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/Scripts/MainGameManager.cs">
+    <Files>
+      <File FileName="Assets/Scripts/GameManager.cs" Line="65" Column="1" />
+      <File FileName="Assets/Scripts/Bottle.cs" Line="120" Column="23" />
+      <File FileName="Assets/Scripts/NewMonoBehaviour.cs" Line="8" Column="1" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="Project Shuwa Shuwa" expanded="True">
+            <Node name="Assets" expanded="True">
+              <Node name="Scripts" expanded="True">
+                <Node name="MainGameManager.cs" selected="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.ItemProperties.Assembly-CSharp PreferredExecutionTarget="1cb9489a-1fed-4dd6-85f4-ba32cce36eba" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MultiItemStartupConfigurations />
+</Properties>
