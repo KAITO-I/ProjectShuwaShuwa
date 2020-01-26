@@ -3,19 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-//==============================
-// フェーズ
-//==============================
-enum Phase
-{
-    HowToPlay,  // 操作説明
-    Countdown,  // カウントダウン
-    Shake,      // 振る
-    Boom,       // ボトル爆発
-    ResetAccel, // ジョイコンの加速度リセット
-    Shoot,      // 放つ
-    Measurement // 計測
-}
+
 
 class GameManager : MonoBehaviour
 {
@@ -27,7 +15,7 @@ class GameManager : MonoBehaviour
     //==============================
     // フェーズ設定
     //==============================
-    static Phase phase
+    public static Phase phase
     {
         get { return phase; }
         set

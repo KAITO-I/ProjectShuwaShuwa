@@ -10,6 +10,20 @@ public enum MessageType {
     Shake75POver
 }
 
+//==============================
+// フェーズ
+//==============================
+enum Phase
+{
+    HowToPlay,  // 操作説明
+    Countdown,  // カウントダウン
+    Shake,      // 振る
+    Explode,    // ボトル爆発
+    ResetAccel, // ジョイコンの加速度リセット
+    Shoot,      // 放つ
+    Measurement // 計測
+}
+
 public class MainGameManager : MonoBehaviour
 {
     //==============================
@@ -18,36 +32,12 @@ public class MainGameManager : MonoBehaviour
     public static MainGameManager instance { get; set; }
 
     //==============================
-    // メッセージ設定
-    //==============================
-    public static void SetLeftMessage(MessageType type){
-        if ((int)type == -1) instance.leftMessage.gameObject.SetActive(false);
-        else
-        {
-            instance.leftMessage.gameObject.SetActive(true);
-            instance.leftMessage.sprite = instance.messages[(int)type];
-        }
-    }
-
-    public static void SetRightMessage(MessageType type) {
-        if ((int)type == -1) instance.rightMessage.gameObject.SetActive(false);
-        else
-        {
-            instance.rightMessage.gameObject.SetActive(true);
-            instance.rightMessage.sprite = instance.messages[(int)type];
-        }
-    }
-
-    //==============================
     // instance
     //==============================
     [SerializeField]
     PlayerController player;
 
-    [SerializeField]
-    Image leftMessage;
-    [SerializeField]
-    Image rightMessage;
+    
 
     [SerializeField]
     Sprite[] messages;
