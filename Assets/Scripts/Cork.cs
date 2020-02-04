@@ -1,58 +1,32 @@
-﻿using System;
+using System;
 using UnityEngine;
 
-[Serializable]
-class Cork
+class Cork : MonoBehaviour
 {
     [SerializeField]
-    GameObject cork;
+    float multiplePower;
 
-    Rigidbody rb;
+    public Rigidbody Rigidbody { get; private set;}
+    bool firstGroundHit = true;
 
-    bool    shooted;
-    float   distance    = 0f;
-    Vector3 oldFramePos;
-
-    //==============================
-    // スタート
-    //==============================
-    public void Start()
-    {
-        this.rb = this.cork.GetComponent<Rigidbody>();
-
-        this.shooted     = false;
-        this.oldFramePos = this.cork.transform.position;
+    public void Init() {
+        this.Rigidbody = transform.GetComponent<Rigidbody>();
     }
 
-    //==============================
-    // アップデート
-    //==============================
-    public void Update()
-    {
-        if (!this.shooted) return;
-
-        // 移動距離
-        var distance = this.cork.transform.position - this.oldFramePos;
-        this.distance += distance.z;
-
-        // カメラ
-        var cameraPos = Camera.main.transform.position;
-        cameraPos.x += distance.x;
-        cameraPos.y += distance.y;
-        cameraPos.z += distance.z;
-        Camera.main.transform.position = cameraPos;
-
-        this.oldFramePos = this.cork.transform.position;
+    void OnCollisionEnter(Collision collision) {
+        if (!this.firstGroundHit)
+        {
+            MainGameManager.Phase = Phase.HittedFirst;
+            SoundManager.PlaySE(SEID.CorkBound, 0.5f);
+            return;
+        }
+        this.firstGroundHit = false;
+        SoundManager.PlaySE(SEID.CorkFirstHitGround, 1.0f);
     }
 
-    //==============================
-    // コルクを放つ
-    //==============================
-    public void Shoot(float power)
+    public void Shoot(Vector3 up, float power)
     {
-        this.shooted = true;
-
-        this.rb.AddForce(this.cork.transform.up * power * 0.025f, ForceMode.Impulse);
-        this.rb.useGravity = true;
+        this.Rigidbody.AddForce(up * power * this.multiplePower, ForceMode.Impulse);
+        this.Rigidbody.useGravity = true;
     }
 }

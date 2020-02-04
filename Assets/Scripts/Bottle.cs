@@ -1,133 +1,61 @@
-﻿using System;
+using System;
+using System.Collections;
 using UnityEngine;
 
-[Serializable]
-class Bottle
-{
-    GameManager game;
-    Joycon joycon;
+class Bottle : MonoBehaviour {
+    GameObject animationObject; 
 
+    [Header("Animation")]
     [SerializeField]
-    GameObject bottle;
+    float deceleration;
 
-    [Header("Shake")]
+    Animator animator;
+    float    speed;
+
+    [Header("Init")]
     [SerializeField]
-    float shakeSpeed;
-    [SerializeField]
-    float shakePositionRange;
+    float initPosTime;
 
-    float shakePositionY;
-    float defaultPositionY;
-    float maxShakePositionY;
-    float minShakePositionY;
-    float shakePositionYAddDirection;
+    public void Init() {
+        this.animationObject = this.gameObject.transform.Find("Animator").gameObject;
 
-    [Header("Ramble")]
-    [SerializeField]
-    float minAmp;
-    [SerializeField]
-    float maxAmp;
-    [SerializeField]
-    float rambleTime;
-    [SerializeField]
-    float waitingMultipleAmp;
-
-    float amp;
-    float rambleTimer = 0f;
-
-    [Header("Random Ramble")]
-    [SerializeField]
-    float maxInterval;
-
-    [Header("Exprode")]
-    [SerializeField]
-    GameObject boomParticle;
-
-    float randomRambleTimer;
-
-    //==============================
-    // スタート
-    //==============================
-    public void Start(GameManager game, Joycon joycon)
-    {
-        this.game = game;
-        this.joycon = joycon;
-
-        this.shakePositionY = this.defaultPositionY = this.bottle.transform.position.y;
-        this.maxShakePositionY = this.shakePositionY + this.shakePositionRange;
-        this.minShakePositionY = this.shakePositionY - this.shakePositionRange;
-        this.shakePositionYAddDirection = 1f;
-
-        this.amp = this.minAmp;
-
-        this.randomRambleTimer = UnityEngine.Random.value * this.maxInterval;
+        this.animator = this.animationObject.GetComponent<Animator>();
+        this.speed = 0.0f;
     }
 
-    //==============================
-    // アップデート
-    //==============================
-    public void Update()
-    {
-        // ランダム振動生成
-        this.randomRambleTimer -= Time.deltaTime;
-        if (this.randomRambleTimer < 0f)
-        {
-            this.randomRambleTimer = UnityEngine.Random.value * this.maxInterval;
-            this.rambleTimer = this.rambleTime * this.waitingMultipleAmp;
+    public void Updating() {
+        this.speed -= Time.deltaTime * deceleration;
+        if (this.speed < 0f) this.speed = 0f;
+
+        this.animator.SetFloat("speed", this.speed);
+    }
+
+    public void Shake() {
+        this.speed = 1f;
+    }
+
+    public IEnumerator InitPos() {
+        this.animator.enabled = false;
+        var timer = 0f;
+        var pos   = this.animationObject.transform.localPosition;
+        while (true) {
+            timer += Time.deltaTime;
+            this.animationObject.transform.localPosition = Vector3.Lerp(pos, Vector3.zero, timer / this.initPosTime);
+            if (timer / this.initPosTime >= 1f) break;
+            yield return null;
         }
-
-        // 振動
-        this.rambleTimer -= Time.deltaTime;
-        if (this.rambleTimer < 0f) this.rambleTimer = 0f;
-
-        this.joycon.SetRumble(160f, 320f, Mathf.Lerp(this.minAmp, this.amp, this.rambleTimer / this.rambleTime), 15);
+        MainGameManager.Phase = Phase.ChangeAngleII;
     }
 
-    //==============================
-    // 上下運動
-    //==============================
-    public void Shake()
-    {
-        var pos = this.bottle.transform.position;
-        pos.y = (this.shakePositionY += this.shakeSpeed * this.shakePositionYAddDirection * Time.deltaTime);
-        this.bottle.transform.position = pos;
-
-        if (pos.y > this.maxShakePositionY || pos.y < this.minShakePositionY) this.shakePositionYAddDirection *= -1f;
+    public void Rotate(float x, float z) {
+        this.gameObject.transform.Rotate(x, 0f, z);
     }
 
-    //==============================
-    // 位置リセット
-    //==============================
-    public void PosReset()
-    {
-        var pos = this.bottle.transform.position;
-        pos.y = this.shakePositionY = this.defaultPositionY;
-        this.bottle.transform.position = pos;
+    public void ResetRotation() {
+        this.gameObject.transform.eulerAngles = Vector3.zero;
     }
 
-    //==============================
-    // 振動させる
-    //==============================
-    public void Rumble(float ampPower)
-    {
-        this.amp = Mathf.Lerp(this.minAmp, this.maxAmp, ampPower);
-        this.rambleTimer = this.rambleTime;
-    }
-
-    //==============================
-    // 爆発させる
-    //==============================
-    public void Boom()
-    {
-        this.game.InstanceParticle(this.boomParticle, this.bottle.transform);
-        this.bottle.SetActive(false);
-    }
-
-    //==============================
-    // 角度を設定する
-    //==============================
-    public void SetEularAngle(Quaternion qua)
-    {
-        this.bottle.transform.rotation = qua;
+    public Vector3 GetTransformUp() {
+        return this.gameObject.transform.up;
     }
 }
