@@ -56,7 +56,7 @@ public class SoundManager : MonoBehaviour
     List<SEManager> unplayedSESources;
     List<SEManager> playedSESources;
 
-    void Start() {
+    void Awake() {
         if (Instance != null)
         {
             Destroy(this.gameObject);
@@ -64,6 +64,7 @@ public class SoundManager : MonoBehaviour
         }
 
         Instance = this;
+        DontDestroyOnLoad(this);
 
         this.bgmSource = transform.Find("BGMPlayer").GetComponent<AudioSource>();
 

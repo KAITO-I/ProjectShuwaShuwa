@@ -27,7 +27,10 @@ public class JoyconManager: MonoBehaviour
 
     void Awake()
     {
-        if (instance != null) Destroy(gameObject);
+		if (instance != null)
+		{
+			Destroy(gameObject);
+		}
         instance = this;
 		int i = 0;
 

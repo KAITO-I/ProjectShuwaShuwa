@@ -9,6 +9,7 @@ using TMPro;
 public enum Phase
 {
     Title,         // タイトル
+    ToGame,        // ゲームに移動中
     HowToPlayI,    // 操作説明(HOLD)
     HowToPlayII1,  // 操作説明(SHAKE表示中)
     HowToPlayII2,  // 操作説明(SHAKE表示)
@@ -21,7 +22,7 @@ public enum Phase
     ChangeAngleII, // 角度調整
     Shooted,       // 放つ
     HittedFirst,   // 着弾
-    Result,       // 結果表示
+    Result,        // 結果表示
     LoadWait,
     Loading
 }
@@ -33,6 +34,9 @@ public class MainGameManager : MonoBehaviour
     //==============================
     public static MainGameManager Instance { get; private set; }
 
+    public static Joycon Joycon { get; private set; }
+
+    static Joycon joycon;
     static Phase phase;
     static Coroutine showShakeCoroutine = null;
     public static Phase Phase {
@@ -81,11 +85,31 @@ public class MainGameManager : MonoBehaviour
                         break;
 
                     case Phase.Loading:
-                        Instance.StartCoroutine(SceneLoader.Load());
+                        SceneLoader.Load();
                         break;
                 }
             }
         }
+    }
+
+    public static void UpInMenu()
+    {
+        Instance.menuButton.Up();
+    }
+
+    public static void DownInMenu()
+    {
+        Instance.menuButton.Down();
+    }
+
+    public static void SelectedInMenu()
+    {
+        Instance.StartCoroutine(Instance.SelectedMenu());
+    }
+
+    public static void GameStart()
+    {
+        Instance.StartCoroutine(Instance.MoveTitle());
     }
 
     public static void SetMoreShakeAlertDisplayPercent(float t) {
@@ -131,6 +155,13 @@ public class MainGameManager : MonoBehaviour
     [SerializeField]
     CameraController camera;
 
+    [Header("Title")]
+    [SerializeField]
+    GameObject title;
+
+    MenuButton menuButton;
+
+    [Header("In Game")]
     [SerializeField]
     Board board;
 
@@ -166,26 +197,31 @@ public class MainGameManager : MonoBehaviour
 
     void Start()
     {
-        if (Instance != null)
+        if (Instance == null)
         {
-            phase = Phase.HowToPlayI;
-            return;
+            Joycon = JoyconManager.Instance.j.Find(c => c.isLeft);
+
+            Instance = this;
         }
 
-        Instance = this;
+        phase = Phase.Title;
 
-        phase = Phase.HowToPlayI;
+        this.menuButton = this.title.transform.Find("LogoAndButtons").Find("Buttons").GetComponent<MenuButton>();
 
         this.camera.Start();
-        this.player.Start(JoyconManager.Instance.j.Find(c => c.isLeft));
+        this.player.Start(Joycon);
         this.board.Start();
 
         this.countdown.gameObject.SetActive(false);
 
         this.signAnimation = this.sign.GetComponent<Animation>();
+
+        SoundManager.PlayBGM(BGMID.Title);
     }
 
     void Update() {
+        if (SceneLoader.IsLoading) return;
+
         this.player.Update();
 
         switch (Phase) {
@@ -207,6 +243,14 @@ public class MainGameManager : MonoBehaviour
                 this.camera.UpdateRenderer();
                 break;
         }
+    }
+
+    IEnumerator MoveTitle()
+    {
+        var anim = this.title.GetComponent<Animation>();
+        anim.Play();
+        yield return new WaitForSeconds(anim.clip.length);
+        Phase = Phase.HowToPlayI;
     }
 
     IEnumerator Countdown() {
@@ -243,5 +287,17 @@ public class MainGameManager : MonoBehaviour
         this.countdown.gameObject.SetActive(true);
         this.countdown.text = "GAME OVER";
         Phase = Phase.LoadWait;
+    }
+
+    IEnumerator SelectedMenu()
+    {
+        // 画像置き換え
+        Phase = Phase.ToGame;
+        this.menuButton.Selected();
+
+        yield return new WaitForSeconds(1f);
+
+        // 実行
+        this.menuButton.Execute();
     }
 }

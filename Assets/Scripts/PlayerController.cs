@@ -74,6 +74,12 @@ class PlayerController
 
     public void Update() {
         switch (MainGameManager.Phase) {
+            case Phase.Title:
+                if (this.joycon.GetButtonDown(Joycon.Button.DPAD_UP)) MainGameManager.UpInMenu();
+                if (this.joycon.GetButtonDown(Joycon.Button.DPAD_DOWN)) MainGameManager.DownInMenu();
+                if (this.joycon.GetButtonDown(Joycon.Button.STICK)) MainGameManager.SelectedInMenu();
+                break;
+
             case Phase.HowToPlayI:
                 // 連続して押し続けたら次のフェーズへ
                 if (this.joycon.GetButton(Joycon.Button.SL) && this.joycon.GetButton(Joycon.Button.SR))
@@ -207,8 +213,8 @@ class PlayerController
 
                 // ジャイロで角度変更
                 this.bottle.Rotate(
-                    Mathf.Abs(gyroChangeAngleII.y) > 0.1f ? -gyroChangeAngleII.y * 2f : 0f, 
-                    Mathf.Abs(gyroChangeAngleII.z) > 0.1f ? -gyroChangeAngleII.z * 2f : 0f
+                    Mathf.Abs(gyroChangeAngleII.y) > 0.1f ? -gyroChangeAngleII.y : 0f, 
+                    Mathf.Abs(gyroChangeAngleII.z) > 0.1f ? -gyroChangeAngleII.z : 0f
                 );
 
                 // 倒したら放つ
